@@ -1,0 +1,104 @@
+# Start the ZooKeeper service
+$ bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# Start the Kafka broker service
+$ bin/kafka-server-start.sh config/server.properties
+
+# create topic like order_topic
+$ bin/kafka-topics.sh --create --topic order_topic --bootstrap-server localhost:9092
+
+# write some events to this topic
+$ bin/kafka-console-producer.sh --topic order_topic --bootstrap-server localhost:9092
+
+# read these events from this created topic
+$ bin/kafka-console-consumer.sh --topic order_topic --from-beginning --bootstrap-server localhost:9092
+
+# List Topics:
+$ bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+# Describe Topic (Check Partitions and Offsets):
+$ bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic order_topic
+
+# to print messages and offsets:
+$ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic order_topic --partition 1 --offset earliest
+
+#Manually delete messages inside topic:
+$ bin/kafka-topics.sh --bootstrap-server localhost:9092 --topic order_topics --delete
+
+
+What is Apache Kafka?
+Apache Kafka is a distributed messaging system (or a message broker) that handles the transmission of real-time data (messages/events) between different systems. It is used for publish-subscribe messaging, where data producers send messages to topics, and consumers subscribe to these topics to receive the data.
+
+Kafka is widely used because it handles:
+
+High Throughput: Kafka can process millions of messages per second, making it suitable for large-scale applications.
+Fault Tolerance: It ensures that messages are not lost, even in case of system or hardware failures.
+Scalability: Kafka can scale horizontally by adding more brokers and partitions.
+Durability: Messages are stored persistently in Kafka for a configurable time.
+Why Kafka is Needed?
+In a distributed system or large-scale applications, millions of events (or messages) are generated every second. Sending this data directly to multiple systems creates a chaotic dependency between services, which is hard to manage.
+
+Kafka solves this problem by:
+
+Acting as a centralized messaging system to decouple producers (who send data) and consumers (who receive data).
+Providing a real-time event streaming platform where data can be processed and forwarded to multiple systems in parallel.
+Preventing performance downgrades when huge amounts of data (like order or payment events) are produced simultaneously.
+Real-World Example: Online Delivery App
+In an online delivery application:
+
+When a user places an order, an "Order Event" is sent to Kafka.
+The payment service consumes this order event, processes the payment, and produces a new "Payment Event".
+Kafka ensures these events are sent reliably and can be consumed by multiple services like:
+Inventory Service (to update product stock),
+Notification Service (to send emails/SMS),
+Fraud Detection Service (to analyze payments for anomalies).
+Fraud Detection Use Case
+You mentioned fraudulent payments:
+Kafka can help with fraud detection by streaming events to a fraud detection system that applies real-time analysis. For example:
+
+Kafka streams payment events (e.g., user IDs, transaction amounts, locations) to an AI/ML service.
+The service detects patterns (like multiple payments from different locations in a short time) and flags suspicious transactions.
+
+
+Key Kafka Concepts & Terminologies
+Topic: A Kafka topic is a category where messages (events) are stored. Producers write to topics, and consumers read from topics.
+Partition:
+A topic is split into multiple partitions for scalability.
+Each message is stored in a partition and assigned an offset.
+Kafka ensures that messages within a partition are ordered.
+Offset:
+An offset is a unique ID or position of a message within a partition.
+Kafka uses offsets to track which messages a consumer has already read.
+Producer: A producer sends messages (or events) to a Kafka topic.
+Consumer: A consumer listens to a topic and processes the messages.
+Consumer Group:
+Consumers are grouped into a consumer group.
+Kafka distributes partitions among the consumers in a group for parallel processing.
+Brokers:
+A Kafka broker is a server that stores data and serves client requests (producers and consumers).
+Kafka clusters consist of multiple brokers.
+ZooKeeper:
+Kafka uses ZooKeeper for managing the Kafka cluster, brokers, and metadata.
+Note: Kafka newer versions (2.8+) can run without ZooKeeper.
+Replication:
+Kafka replicates data across multiple brokers to ensure fault tolerance.
+A replication factor of 3 means each partition has 3 copies.
+Durability: Kafka stores messages persistently for a configurable retention period (e.g., 7 days), even after consumers have read them.
+Log Compaction:
+Kafka can compact (clean) older messages while keeping the latest version of a message key, saving storage.
+What Makes Kafka Powerful?
+Scalability: Kafka scales horizontally by adding more brokers and partitions.
+Real-Time Streaming: Kafka enables low-latency real-time processing of events.
+Fault Tolerance: Data is replicated across brokers to avoid loss.
+High Availability: Kafka can continue working even if some brokers fail.
+Decoupling: Producers and consumers are decoupled, meaning they can evolve independently.
+
+Summary
+Apache Kafka is a distributed message broker used for real-time event streaming.
+It is essential for handling large-scale data and decoupling systems.
+Kafka ensures fault tolerance, high throughput, and real-time processing.
+In Spring Boot:
+Producers send events to topics.
+Consumers use @KafkaListener to consume events from topics.
+Kafka concepts like topics, partitions, offsets, brokers, and consumer groups make it a robust choice for distributed systems.
+
